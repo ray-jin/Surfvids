@@ -352,41 +352,6 @@ class Users extends CI_Model
 		return $this->db->affected_rows() > 0;
 	}
 
-	/**
-	 * Update user login info, such as IP-address or login time, and
-	 * clear previously generated (but not activated) passwords.
-	 *
-	 * @param	int
-	 * @param	bool
-	 * @param	bool
-	 * @return	void
-	 */
-	function update_login_info($user_id, $record_ip, $record_time)
-	{
-		$this->db->set('new_password_key', NULL);
-		$this->db->set('new_password_requested', NULL);
-
-		if ($record_ip)		$this->db->set('last_ip', $this->input->ip_address());
-		if ($record_time)	$this->db->set('last_login', date('Y-m-d H:i:s'));
-
-		$this->db->where('id', $user_id);
-		$this->db->update($this->table_name);
-	}
-        
-        /**
-	 * Update user facebook info
-	 *
-	 * @param	int
-	 * @param	string	 
-	 * @return	void
-	 */
-	function update_fb_info($user_id, $fb)
-	{
-		$this->db->set('fname', $fb);
-				
-		$this->db->where('id', $user_id);
-		$this->db->update($this->table_name);
-	}
 	
      
         /**

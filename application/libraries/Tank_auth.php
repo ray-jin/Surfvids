@@ -43,7 +43,7 @@ class Tank_auth
 	 * @param	bool
 	 * @return	bool
 	 */
-	function login($login, $password, $remember, $login_by_username, $login_by_email, $level_check=0)
+	function login($login, $password, $login_by_username, $login_by_email, $level_check=0)
 	{
                         
 		if ((strlen($login) > 0) AND (strlen($password) > 0)) {
@@ -65,110 +65,23 @@ class Tank_auth
 						$this->ci->config->item('phpass_hash_portable', 'tank_auth'));
 				
                                 if ($hasher->CheckPassword($password, $user->password)) {		// password ok
+					
+                                        $this->ci->session->set_userdata(array(
+                                                        'user_id'	=> $user->id,
+                                                        'username'	=> $user->username,
+                                        ));
 
-					if ($user->banned == 1) {									// fail - banned
-						//$this->error = array('banned' => $user->ban_reason);
-                                            $this->error = array('banned' => '');
-
-					} else {
-						$this->ci->session->set_userdata(array(
-								'user_id'	=> $user->id,
-								'username'	=> $user->username,
-								'status'	=> ($user->activated == 1) ? STATUS_ACTIVATED : STATUS_NOT_ACTIVATED,
-                                                                'd_token'       => $user->device_token,
-						));
-
-						if ($user->activated == 0) {							// fail - not activated
-							$this->error = array('not_activated' => '');
-                                                        $this->error = array('message' => 'Not activated');
-
-						} else {												// success
-							$this->ci->users->update_login_info(
-									$user->id,
-									$this->ci->config->item('login_record_ip', 'tank_auth'),
-									$this->ci->config->item('login_record_time', 'tank_auth'));
-							return TRUE;
-						}
-					}
+                                    
+                                        return TRUE;
+                                        
+					
 				}
 			}
 		}
 		return FALSE;
 	}
         
-        /**
-	 * Login user on the site. Return TRUE if login is successful
-	 * (user exists and activated, not banned, password is correct), otherwise FALSE.
-	 *
-	 * @param	string : mail name
-	 * @param	string	(facebook id)
-	 * @return	bool
-	 */
-	function login_f($umail,$fname,$uname,$upass,$d_token)
-	{
-            if (!is_null($user = $this->ci->users->get_user_by_fname($fname))){
-                if ($user->email == $umail){ // specific fnmae & email is exist in db
-                     if ($user->banned == 1) {// fail - banned
-                                //$this->error = array('banned' => $user->ban_reason);
-                            $this->error = array('banned' => '');
-                            $this->error = array('message' => 'User is banned');
-                            return false;    
-                        }                                
-
-                        if ($user->activated == 0) {							// fail - not activated
-                            $this->error = array('not_activated' => '');
-                            $this->error = array('message' => 'User is not activated');
-                            return false;
-
-                        } else {												// success
-
-                            $this->ci->session->set_userdata(array(
-                               'user_id'	=> $user->id,
-                            ));
-                            return true;   
-                        }
-                }
-                else{
-                    $this->error = array('message' => 'Incorrect facebook id or mail id');
-                    return false;
-                }
-                
-            }
-            else{
-                if ($umail==""){
-                    $this->error = array('message' => 'Invalid mail id');
-                    return false;    
-                }
-                
-                if (!is_null($user = $this->ci->users->get_user_by_email($umail))) { //use email
-                    if (($user->fname=="")|| (!$user->fname)){ // set facebook id on specific user id;                                            
-                    $this->ci->users->update_fb_info($user->id,$fname);
-                    $this->ci->session->set_userdata(array(
-                                                'user_id'	=> $user->id,
-
-                                                ));
-                    return true;   
-                    }
-                    else{
-                        $this->error = array('message' => 'Incorrect facebook id or mail id');
-
-                        return false;
-                    }
-                }
-                else{ //sign up 
-                    if (($uname=="") || ($upass=="")){
-                        $this->error = array('message' => 'Username or password is empty');
-                        return false;
-                    }
-                        
-                    return $this->create_user($uname, $umail, $upass, $d_token,$fname);
-
-                }
-                
-            }
-          
-            return FALSE;
-	}
+      
 
 	/**
 	 * Logout user from the site
@@ -193,20 +106,10 @@ class Tank_auth
 	 */
 	function is_logged_in($activated = TRUE)
 	{
-		return $this->ci->session->userdata('status') === ($activated ? STATUS_ACTIVATED : STATUS_NOT_ACTIVATED);
+            
+		return $this->ci->session->userdata('user_id') ;
 	}
-        
-        function is_valid_session($uid,$sid) //user id, session id
-	{
-		if (!is_null($user = $this->ci->users->get_user_by_id($uid,true))){
-                    if ($user->session_id==$sid)
-                        return true;
-                    else 
-                        return false;
-                }
-                return false;
-                        
-	}
+      
 
         function is_admin_level() {
 		return $this->ci->session->userdata('level') == 1;
@@ -222,16 +125,6 @@ class Tank_auth
 		return $this->ci->session->userdata('user_id');
 	}
         
-        function update_session_info($user_id, $session_id, $d_token)
-	{
-                $this->ci->users->update_session_info($user_id,$session_id, $d_token);
-                
-	}
-        
-        function get_session_id()
-	{
-		return $this->ci->session->userdata('session_id');
-	}
         
 
 	/**

@@ -4,7 +4,7 @@
 
 	<section id="bottom">
 		<p>
-			<strong>Copyright &copy; 2012 <?php echo SITE_NAME; ?></strong>
+			<strong>Copyright &copy; 2013 <?php echo SITE_NAME; ?></strong>
 		</p>
 	</section>
 </body>
