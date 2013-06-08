@@ -69,7 +69,8 @@
 	</section><!-- end of secondary bar -->
 
 <?php
-	require ("sidebar_v.php");
+        
+            require ("sidebar_v.php");
 ?>
 
 	<section id="main" class="column">

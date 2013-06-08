@@ -16,6 +16,7 @@ class Auth extends CI_Controller
 	}
 
         function _remap($method){
+            
             $this->load->view('header_v');
             $this->{$method}();
             $this->load->view('footer_v');

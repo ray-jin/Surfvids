@@ -41,7 +41,8 @@
 			<li class="icn_settings"><a href="http://localhost/Surfvids/index.php/user/user_edit/1">Admin</a></li>
 			<li class="icn_jump_back"><a href="javascript:confirm_logout()">Logout</a></li>
 		</ul>
-<?php
+<?php   
+            
 	endif; 
 ?>		
 		

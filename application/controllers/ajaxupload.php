@@ -97,8 +97,9 @@ class Ajaxupload extends CI_Controller
                 echo json_encode($result);
                 return;
             }
-            
-            unlink($this->config->item('upload_path')."/".$post_id."/image/".$prev['image_url']); //delete physical image file
+            $tmp=$this->config->item('upload_path')."/".$post_id."/image/".$prev['image_url'];
+            if (file_exists($tmp))
+                unlink($this->config->item('upload_path')."/".$post_id."/image/".$prev['image_url']); //delete physical image file
             $img_name=$this->upload->file_name;
              $qry = array();
             $qry = array_merge(	

@@ -16,9 +16,13 @@ class Category extends CI_Controller
 	}
 	
         function _remap($method) {
-		$this->load->view('header_v');
-		$this->{$method}();
-		$this->load->view('footer_v');
+            if(!$this->tank_auth->is_logged_in()) {
+                redirect('auth/login');
+                return;
+            }
+            $this->load->view('header_v');
+            $this->{$method}();
+            $this->load->view('footer_v');
 	}
         
 	function index()
@@ -43,17 +47,28 @@ class Category extends CI_Controller
 			return;
 		}
                 $prev=$this->categories->get_specific_data($post_id);
-          
-                
-                //unlink($this->config->item('upload_path')."/".$post_id."/image/".$prev['image_url']); //delete physical image file
-                //unlink($this->config->item('upload_path')."/".$post_id."/video/".$prev['video_url']); //delete physical image file
-               var_dump( $this->load->helper('file'));
+               
                 delete_files($this->config->item('upload_path')."/".$post_id,TRUE);                
                 rmdir($this->config->item('upload_path')."/".$post_id);
                 
 		$this->_proc_post_del($post_id);
 		redirect("category");
-    }
+        }
+        
+         function clip_del() {
+		
+                $clip_id = $this->uri->segment(3, 0);
+		if (empty($clip_id)) {
+			echo "select Clip!";
+			return;
+		}
+                $prev=$this->categories->getClipById($clip_id);
+                $category_id = $prev->category_id;
+                unlink($this->config->item('upload_path')."/".$category_id."/video/".$prev->video_url); //delete physical image file
+                $strSql = "DELETE FROM clips WHERE id='$clip_id' ";
+                $this->db->query($strSql);
+                redirect("category/category_edit/".$category_id);
+        }
 	
         function category_add() {
             $data = $this->_proc_post_add();
@@ -64,7 +79,7 @@ class Category extends CI_Controller
        function category_edit() {		
 		$post_id = $this->uri->segment(3, 0);
 		if (empty($post_id)) {
-			echo "select car!";
+			echo "select category!";
 			return;
 		}
 		
@@ -95,7 +110,6 @@ class Category extends CI_Controller
                                                 'price'		=> $this->input->post('price'),
                                                 'video_info'	=> $this->input->post('video_info'),
                                                 'image_url'     => "",
-                                                'video_url'     => "",
                                         )
                                 );
                                 $data['show_message'] = "Successfully added!";
@@ -110,60 +124,12 @@ class Category extends CI_Controller
 		return $data;
         }
         
-        public function updateImg(){
-          
-            $post_id = $_POST['category_id'];
-                
-            if ($post_id==null || $post_id=="") {                 
-                 $result['status']=0;
-                 $result['error']="Select the category";
-                 echo json_encode($result);
-                 return;
-            }
-            if ($_FILES['img']['name']==""){
-                 $result['status']=0;
-                 $result['error']="Select the File";
-                 echo json_encode($result);
-                 return;
-            }
-            
-            $prev=$this->categories->get_specific_data($post_id);
-            $this->load->library('upload');
-            $this->upload->set_upload_path($this->config->item('upload_path')."/".$post_id."/image/");
-            $this->upload->set_max_filesize($this->config->item('max_img_size'));                                                                
-            $img_name=$this->upload->do_upload("img");
-                  
-             if (!$img_name) {//error;{}
-                echo "<script>window.top.window.stopUpload(0,".$this->upload->display_errors().");</script>";   
-                return;
-            }
-            
-            unlink($this->config->item('upload_path')."/".$post_id."/image/".$prev['image_url']); //delete physical image file
-            $img_name=$this->upload->file_name;
-             $qry = array();
-            $qry = array_merge(	
-                    $qry,
-                    array(
-                            'id' => $post_id,                            
-                            'image_url'     => $img_name,
-                    )
-            );
-
-            $this->db->where('id', $post_id);
-            $this->db->update("categories", $qry);
-            $result = 1;
-            echo "<script>window.top.window.stopUpload(".$result.",'','".
-                HOST. $this->config->item('upload_path')."/".$post_id."/image/".$img_name.
-                    "');</script>";   
-
-        }
+      
         
         private function &_proc_post_edit($new_idx) { 
     
                 $this->form_validation->set_rules('name', 'Name', 'trim|required');
-                $this->form_validation->set_rules('price', 'Price', 'trim|required|is_natural|numeric');
-
-
+             
                 $qry = array();
 		$data = array();
 		
@@ -174,38 +140,7 @@ class Category extends CI_Controller
 				
                             $this->load->library('upload');   
                             $prev=$this->categories->get_specific_data($new_idx);
-                            $img_name=$prev['image_url'];
-                            $video_name=$prev['video_url'];
-                            
-                            if ($_FILES['img']['name']!=""){
-
-                                $this->upload->set_upload_path($this->config->item('upload_path')."/".$new_idx."/image/");
-                                $this->upload->set_max_filesize($this->config->item('max_img_size'));                                                                
-                                $img_name=$this->upload->do_upload("img");
-
-                                if ( !$img_name) {//error;{}
-                                    $this->form_validation->set_message("image_file",$this->upload->display_errors());                                
-                                    return $data;
-                                }
-                                 $img_name=$this->upload->file_name;
-                                 unlink($this->config->item('upload_path')."/".$new_idx."/image/".$prev['image_url']); //delete physical image file
-                            }
-                            
-                            if ($_FILES['video']['name']!=""){
-                                
-                                $this->upload->set_upload_path($this->config->item('upload_path')."/".$new_idx."/video/");
-                                $this->upload->set_max_filesize($this->config->item('max_video_size'));
-                                $video_name=$this->upload->do_upload("video");
-
-                                if (!$video_name) {
-                                    $this->form_validation->set_message("video_file",$this->upload->display_errors());
-                                    return $data;
-                                }
-                                $video_name=$this->upload->file_name;
-                                unlink($this->config->item('upload_path')."/".$new_idx."/video/".$prev['video_url']); //delete physical video file
-                            }
-                            
-                            
+                                                        
                             $qry = array_merge(	
 					$qry,
 					array(
@@ -213,8 +148,7 @@ class Category extends CI_Controller
                                                 'name'  =>    $this->input->post('name'),                                                
                                                 'price'		=> $this->input->post('price'),
                                                 'video_info'	=> $this->input->post('video_info'),
-                                                'image_url'     => $img_name,
-                                                'video_url'     => $video_name,
+                                                
 					)
 				);
 				

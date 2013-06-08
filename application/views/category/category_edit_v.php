@@ -42,7 +42,6 @@
 	);
         
      
-	
 	echo form_open_multipart($this->uri->uri_string());
 	
 	if(!empty($show_message)) {
@@ -50,10 +49,8 @@
 	}else{
 		$this->form_validation->set_error_delimiters('<h4 class="alert_error">', '</h4>');		
                 echo form_error($name['name']);
-		echo form_error($price['name']);
-
-        
-		if (isset($show_errors)) {?>
+		
+                if (isset($show_errors)) {?>
                     <h4 class="alert_error">
                         <?php if (is_array($show_errors)) {?>
                         <?php foreach ($show_errors as $error) :?>
@@ -66,6 +63,17 @@
 <?php 
 		}
 	}
+        
+        $clip_id = $this->uri->segment(4, 0);
+        
+        $clip=$this->categories->getClipById($clip_id);
+        
+        $video_url="";
+        if ($clip!=null){
+            
+            $video_url=HOST.$this->config->item('upload_path')."/".$post['id']."/video/".$clip->video_url;
+        }
+        
 ?>
 
 <div class="module_content">    
@@ -131,21 +139,14 @@
                 <input type="hidden" name="category_id" value="<?php echo $post['id']?>" readonly="readonly"  />   
                 <input type="file" name="video" accept="video/*" style="vertical-align: middle; padding-left: 45px;" />
                 <input type="button" name="submitBtn" value="Upload" onclick="startVideoUpload();"/>                  
-                <img id="f2_upload_process" src="<?php echo RESOURCE_PATH;  ?>/loader.gif" style="vertical-align: middle; visibility: visible;" />
+                <img id="f2_upload_process" src="<?php echo RESOURCE_PATH;  ?>/loader.gif" style="vertical-align: middle; visibility: hidden;" />
                 <br/>
                 
-              
-                
-                <object width="640" height="360" id="qt" classid="clsid:02BF25D5-8C17-4B23-BC80-D3488ABDDC6B" 
-                        codebase="http://www.apple.com/qtactivex/qtplugin.cab" style="float:left; left:0; position:relative; top:0;" __idm_id__="1681801217">
-                    <param name="src" value="1.mov">
-                    <param name="autoplay" value="true">
-                    <param name="controller" value="true">
-                    <embed id="videoPlayer" name="videoPlayer" src="" bgcolor="000000" width="640" height="360" scale="ASPECT" 
-                           qtsrc="1.src" kioskmode="true" showlogo="false&quot;" autoplay="true"
-                           controller="true" pluginspage="http://www.apple.com/quicktime/download/" __idm_id__="1681801218">
-                </object>
-                
+                <?php if ($video_url!="") {?>
+                    <embed  src="<?php echo $video_url;?>" width="300" height="200" autoplay="true" 
+                    controller="true" loop="false" pluginspage='http://www.apple.com/quicktime/download/' style="padding-left: 50px;">
+                    </embed>
+                <?php }?>
                 <div id="f2_upload_form" style="position: relative; padding-left: 40px;"></div> <br/>
             </form>
             
@@ -165,9 +166,13 @@
     </div>
  
 </article>
-
-
+<?php    
+   echo "<script> var base_url='".site_url("category/category_edit")."/".$post['id']."/';".
+           "var clip_del_url='".site_url("category/clip_del")."/';".
+           "</script>";
+?>
 <script>
+    
     function ListClips_Request(){
         var video_list_url= "<?php echo site_url()."/ajaxupload/list_clips"?>";
         var id=document.getElementById('category_id').value;
@@ -199,7 +204,8 @@
            
            var id=a.id; var full_url=a.full_url;
            clip_list.innerHTML+="<tr class='clips'>";
-           clip_list.innerHTML+="<td>"+(i+1)+"</td><td>"+ele+"<td> <a href=javascript:viewMovie('"+full_url+"')>View</a>";
+           clip_list.innerHTML+="<td>"+(i+1)+"</td><td>"+ele+"<td> <a href=javascript:viewMovie('"
+               +id+"')>View</a>&nbsp;|&nbsp;<a href=javascript:delClip('"+id+"')>Del</a>";
            clip_list.innerHTML+="</td></tr>";
         // Do something with element i.
         }
@@ -214,6 +220,12 @@
         });
     }
     
+    function delClip(id){
+        if(!confirm('Are you sure to delete?')) {
+                return;
+        }
+        window.location.href = clip_del_url + id;
+    }
     function goCategoryList(){
         window.location.href="<?php echo site_url('category'); ?>";
     }
@@ -271,11 +283,12 @@
         new_row.className="clips";
         var clip_list=document.getElementById("clip_list");
         var len=clip_list.getElementsByClassName('clips').length+1;
-        new_row.innerHTML="<td>"+len+"</td><td>"+result.video_url+"</td><td>"+result.id +"</td>";
-        
+        new_row.innerHTML="<td>"+len+"</td><td>"+result.video_url+"</td><td><a href=javascript:viewMovie('"
+            +result.id +"')>View&nbsp;|&nbsp;<a href=javascript:delClip('"+result.id+"')>Del</a></td>";
+         
         clip_list.appendChild(new_row);
          var main=document.getElementById("main");
-        var a=parseInt(main.style.height)+20;
+        var a=parseInt(main.style.height)+35;
         
         main.style.height=a+'px';
          $(function(){
@@ -312,10 +325,10 @@
     }
 
     function stopUpload(data){
-        
+        alert(data);
         var result=eval("("+data+")");
         var img_url=result.img_url;
-                
+        
         if (result.status == 1){
             result = '<span class="msg">The file was uploaded successfully!<\/span><br/><br/>';
             document.getElementById('pic').src=img_url ;
@@ -329,10 +342,11 @@
         
         return true;   
     }
+    
     function viewMovie(src){
-        var videoPlayer=document.getElementById('videoPlayer');
-        videoPlayer.src=src;
-        //videoPlayer.play();
+        window.location.href=base_url+src;
     }
     ListClips_Request();
+    
+    
 </script> 

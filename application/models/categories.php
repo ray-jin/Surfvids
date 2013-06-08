@@ -538,6 +538,22 @@ class Categories extends CI_Model
             
 	}
         
+        /**
+	 * Create new clip
+	 *
+	 * @cid :category id
+         * @uid : user_id
+         * @comment : comment text
+	 * @return	array
+	 */
+	 function getClipById($clip_id)
+	{             
+            $this->db->where('id', $clip_id);            
+            $query = $this->db->get("clips");
+            if ($query->num_rows() == 1) return $query->row();
+		return NULL;
+	}
+        
          /**
 	 * get list of comments watched by users for a specific car
 	 *
@@ -576,90 +592,7 @@ class Categories extends CI_Model
             $this->db->delete($this->comment_car_table_name);
 	}
         
-         /**
-	 * Create new item into message_car table
-	 *
-	 * @s_id :sender id
-         * @r_id : receiver_id
-         * @message : message text
-	 * @return	array
-	 */
-	 function add_message_car($s_id,$r_id,$message)
-	{
-             
-            $this->db->set('sender_id', $s_id);
-            $this->db->set('receiver_id', $r_id);
-            $this->db->set('message', $message);
-            $this->db->set('created', date('Y-m-d H:i:s'));
-            
-            
-            if ($this->db->insert($this->message_car_table_name)) {
-                   $msg_id = $this->db->insert_id();                                      
-                   return $msg_id;
-            }
-            
-            return "-1";
-            
-	}
         
-        /**
-	 * get list of messages watched by users for a specific car
-         * @s_id  : sender user id
-         * @r_id  : receiver user id
-         * @number : number of messages
-         * @offset : offset of message
-	 * @return	array
-	 */
-	 function list_message_car($s_id,$r_id,$number,$offset)
-	{
-            if ($s_id!="-1")
-                $this->db->where('sender_id', $s_id);
-            if ($r_id!="-1")
-                $this->db->where('receiver_id', $r_id);
-            
-            $query = $this->db->get($this->message_car_table_name,$number,$offset);
-            
-            $list=array(); $i=0;
-            foreach ($query->result() as $row)
-            {
-                //'user'	=>	'Users',	
-                $list[$i] = array( 'msg_id' => $row->id,
-                        'msg' => $row->message,
-                    'c_date' => $row->created,
-                );
-                
-                $i++;                
-            }            
-            return $list;           
-	}
-        
-         /**
-	 * Remove message car record by id
-	 *
-	 * @param	int 
-	 * @return	void
-	 */
-	function remove_message_car_by_id($msg_id)
-	{
-            $this->db->where('id', $msg_id);
-
-            $this->db->delete($this->message_car_table_name);
-	}
-        
-        
-        
-        /**
-	 * Remove offer car record by id
-	 *
-	 * @param	int 
-	 * @return	void
-	 */
-	function remove_offer_car_by_id($offer_id)
-	{
-            $this->db->where('id', $offer_id);
-
-            $this->db->delete($this->offer_car_table_name);
-	}
 
         
         
