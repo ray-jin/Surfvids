@@ -1,7 +1,7 @@
 <article class="module width_full">
 <header>
 	<h3>
-	Edit ( <?php echo $post['id']; ?> ) </h3>
+	Edit Category </h3>
 </header>
 <?php
 	
@@ -77,10 +77,9 @@
 ?>
 
 <div class="module_content">    
-    <fieldset >
-            <label>Category ID</label>
-            <input type="text" name="<?php echo $category_id['name']; ?>" value="<?php echo $post['id']?>" readonly="readonly"/>
-    </fieldset>
+    
+    <input type="hidden" name="<?php echo $category_id['name']; ?>" value="<?php echo $post['id']?>" />
+    
     <fieldset >
             <label>Name</label>
             <input type="text" name="<?php echo $name['name']; ?>" value="<?php echo $post['name']?>" />
@@ -325,7 +324,7 @@
     }
 
     function stopUpload(data){
-        alert(data);
+        
         var result=eval("("+data+")");
         var img_url=result.img_url;
         

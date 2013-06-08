@@ -275,8 +275,7 @@ class Auth extends CI_Controller
 						$this->form_validation->set_value('login')))) {
 
 					$data['site_name'] = $this->config->item('website_name', 'tank_auth');
-                                        
-                                        
+
 
 					// Send email with password activation link
 					$this->_send_email('forgot_password', $data['email'], $data);
@@ -465,7 +464,7 @@ class Auth extends CI_Controller
 	 */
 	function _show_message($message)
 	{
-		//$this->session->set_flashdata('message', $message);
+		$this->session->set_flashdata('message', $message);
 		redirect('/auth/');
 	}
 

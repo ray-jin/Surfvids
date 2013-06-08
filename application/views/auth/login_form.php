@@ -63,8 +63,18 @@ $level = array(
                         <td><?php echo form_password($password); ?></td>
                         <td style="color: red;"></td>
                 </tr>
+                
+	<tr>
+		<td colspan="1">
+			<?php echo form_submit('submit', 'Login'); ?>
+		</td>
+                
+                <td colspan="2">
+			<?php echo anchor('/auth/forgot_password/', 'Forgot password'); ?>
+		</td>
+	</tr>
         </table>
-        <?php echo form_submit('submit', 'Login'); ?>
+        
     </div>
 </div>
 <?php echo form_close(); ?>

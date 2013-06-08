@@ -3,7 +3,6 @@
 	
 	$config['main_category'] = array(
                 'category'	=>	'Categories',
-                'backend\bcomment'	=>	'Comments',
 	);
         $config['max_count_per_page'] = 10;	
         $config['duplicate_mail'] = "Email address already exist";

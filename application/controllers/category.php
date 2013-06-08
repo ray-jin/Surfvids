@@ -69,6 +69,20 @@ class Category extends CI_Controller
                 $this->db->query($strSql);
                 redirect("category/category_edit/".$category_id);
         }
+        
+         function comment_del() {
+		
+                $clip_id = $this->uri->segment(3, 0);
+		if (empty($clip_id)) {
+			echo "select Clip!";
+			return;
+		}
+                $prev=$this->categories->get_comment_by_id($clip_id);
+                $category_id = $prev->category_id;
+                
+                $prev=$this->categories->remove_comment_by_id($clip_id);
+                redirect("category/category_comment/".$category_id);
+        }
 	
         function category_add() {
             $data = $this->_proc_post_add();
@@ -87,6 +101,19 @@ class Category extends CI_Controller
 		$data['post_key'] = "category";	
 		$data['post'] = $this->categories->get_specific_data($post_id);
 		$this->load->view('category/category_edit_v', $data);
+	}
+        
+        function category_comment() {
+		$post_id = $this->uri->segment(3, 0);
+		if (empty($post_id)) {
+			echo "select category!";
+			return;
+		}
+		
+		$data = $this->_proc_post_edit($post_id);
+		$data['post_key'] = "category";	
+		$data['post'] = $this->categories->get_specific_data($post_id);
+		$this->load->view('category/category_comment_v', $data);
 	}
         
         private function &_proc_post_add() {

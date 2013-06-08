@@ -28,8 +28,12 @@ $f_search = array(	//text field
             <tbody> 
             <?php
             $i = 1;
-            foreach($category_list as $row) {	 
-                $video_info=substr($row['video_info'],0,30)."...";
+            foreach($category_list as $row) {
+                $video_info=$row['video_info'];
+                if (strlen($row['video_info'])>30){
+                    $video_info=substr($row['video_info'],0,30)."...";
+                }
+                $video_url=$this->categories->get_clip_urls($row['id']);
             ?>
                 <tr >		
                     <td><?php echo $i; ?></td>
@@ -44,17 +48,28 @@ $f_search = array(	//text field
                             else{
                                 echo "<div style='color:red'> No Image </div>";
                             }
-                                
                         ?>
-                        
                              
                     </td>
                     <td>$<?php echo $row['price'];?></td>
-                    <td><?php echo $row['video_url'];?></td>                  
+                    <td>
+                        <?php
+                            if ($video_url!=""){
+                                echo $video_url;
+                        ?>
+
+                        <?php
+                            }
+                            else{
+                                echo "<div style='color:red'> No Video </div>";
+                            }
+                        ?>
+                    </td>
                     <td><?php echo $video_info?></td>
                     <td>
-                        <input type="image" title="Edit" src="<?php echo IMG_DIR; ?>/icn_edit.png" onclick="goedit(<?php echo $row['id'];?>)">
-                        <input type="image" title="Trash" src="<?php echo IMG_DIR; ?>/icn_trash.png" onclick="confirm_del(<?php echo $row['id'];?>)">
+                        <input type="image" title="Edit" style="vertical-align: middle;" src="<?php echo IMG_DIR; ?>/icn_edit.png" onclick="goedit(<?php echo $row['id'];?>)">
+                        <input type="image" title="Trash" style="vertical-align: middle;" src="<?php echo IMG_DIR; ?>/icn_trash.png" onclick="confirm_del(<?php echo $row['id'];?>)">
+                        <input type="image" title="Comment" style="vertical-align: middle;" weight="16px;" height="16px;" src="<?php echo IMG_DIR; ?>/icn_comment.png" onclick="gocomment(<?php echo $row['id'];?>)">
                     </td>			
                 </tr>
             <?php
@@ -82,6 +97,9 @@ $f_search = array(	//text field
             }
             function goedit(pid) {
                     window.location.href = "<?php echo site_url("$post_key"."/".$post_key."_edit"); ?>/" + pid;
+            }
+            function gocomment(pid) {
+                    window.location.href = "<?php echo site_url("$post_key"."/".$post_key."_comment"); ?>/" + pid;
             }
     </script>
 
