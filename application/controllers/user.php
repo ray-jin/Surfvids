@@ -15,12 +15,12 @@ class User extends CI_Controller
 		$this->lang->load('tank_auth');
 		
 		$this->load->library('form_validation');
-
+                $this->load->model('tank_auth/users');
 		if (!$this->tank_auth->is_logged_in())
 		{
 			redirect('/auth/login/');
 		}
-		$this->load->model('manage_m');
+		
 	}
 
 	function _remap($method) {
@@ -34,20 +34,14 @@ class User extends CI_Controller
 		$start_no = empty($_REQUEST['per_page'])? 0:$_REQUEST['per_page'];		
 		$per_page = $this->config->item('max_count_per_page');
 
-		$result = $this->manage_m->get_object_list("users",-1,$start_no,$per_page);
+		$result = $this->users->get_object_list("users",-1,$start_no,$per_page);
 		$total_page = $result['total'];
 		$data['user_list'] = $result['rows'];
 		
 		$base_url = site_url("user?a=1");
-		$data['pagenation'] = $this->manage_m->_create_pagenation($per_page, $total_page, $base_url);
+		$data['pagenation'] = $this->users->_create_pagenation($per_page, $total_page, $base_url);
 		$data['post_key'] = "user";
 		$this->load->view('user/user_list_v',$data);	
-	}
-	
-	function user_add() {
-		$data = $this->_proc_post_add();
-		$data['post_key'] = "user";
-		$this->load->view('user/user_add_v', $data);
 	}
 		
 	function user_edit() {		
@@ -59,20 +53,10 @@ class User extends CI_Controller
 		
 		$data = $this->_proc_post_edit($post_id);
 		$data['post_key'] = "user";	
-		$data['post'] = $this->manage_m->get_specific_data($post_id, "users");
+		$data['post'] = $this->users->get_specific_data($post_id, "users");
 		$this->load->view('user/user_edit_v', $data);
 	}
 		
-	function user_del() {
-		$post_id = $this->uri->segment(3, 0);
-		if (empty($post_id)) {
-			echo "select task!";
-			return;
-		}
-		$this->_proc_post_del($post_id);
-		
-		redirect("user");
-	}
 	
 	private function &_proc_post_add() {
 		$this->load->library('upload');
@@ -87,14 +71,14 @@ class User extends CI_Controller
 		
 		if ($this->form_validation->run())
 		{
-			if( !$this->manage_m->confrim_email($this->input->post('femail')) )
+			if( !$this->users->confrim_email($this->input->post('femail')) )
 			{
 				$data['show_errors'] = $this->config->item('duplicate_mail');
 				return $data;
 			}
 			
 			$tbl_name = "users";
-			$new_idx = $this->manage_m->get_next_insert_idx($tbl_name);
+			$new_idx = $this->users->get_next_insert_idx($tbl_name);
 		
 			if ( empty($data['show_errors']) || count($data['show_errors'])==0 ) {
 				
@@ -145,7 +129,7 @@ class User extends CI_Controller
 		{	
                     $suffix = " and id != ".$this->input->post('fid');
                             
-                    if( !$this->manage_m->confrim_email($this->input->post('femail'),$suffix ))
+                    if( !$this->users->confrim_email($this->input->post('femail'),$suffix ))
                     {
                             $data['show_errors'] = $this->config->item('duplicate_mail');
                             return $data;
@@ -156,24 +140,14 @@ class User extends CI_Controller
 
 				$hasher = new PasswordHash($this->config->item('phpass_hash_strength', 'tank_auth'), $this->config->item('phpass_hash_portable', 'tank_auth') );
 				$hashed_password = $hasher->HashPassword($this->input->post('fpassword'));				//}
-				//$fbanned = ($this->input->post('fbanned')=="on") ? "1" ; "0";
-                                $fbanned="0";
-                                if ($this->input->post('fbanned')=="on")
-                                    $fbanned="1";
-                                
+
 				$qry = array_merge(	
 					$qry,
 					array(
 						'id'		=> $new_idx,						
 						'username'  => $this->input->post('fusername'),
 						'email'		=> $this->input->post('femail'),
-						'password'	=> $hashed_password,
-						'phone'		=> $this->input->post('fphone'),
-						'loc'	=> $this->input->post('floc'),
-                                                'banned'	=> $fbanned,
-						'type'		=> $this->input->post('ftype'),
-						'verified_pt' => $this->input->post('fverified'),
-						'donated_pt'  => $this->input->post('fdonated')			
+						'password'	=> $hashed_password
 					)
 				);
 				

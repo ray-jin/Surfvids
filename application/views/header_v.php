@@ -41,11 +41,7 @@
 
 });
     </script>
-    <script type="text/javascript">
-    $(function(){
-        $('.column').equalHeight();
-    });
-</script>
+    
 
 </head>
 

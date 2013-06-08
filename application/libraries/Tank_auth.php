@@ -457,34 +457,7 @@ class Tank_auth
 		return FALSE;
 	}
 
-	/**
-	 * Delete user from the site (only when user is logged in)
-	 *
-	 * @param	string
-	 * @return	bool
-	 */
-	function delete_user($password)
-	{
-		$user_id = $this->ci->session->userdata('user_id');
-
-		if (!is_null($user = $this->ci->users->get_user_by_id($user_id, TRUE))) {
-
-			// Check if password correct
-			$hasher = new PasswordHash(
-					$this->ci->config->item('phpass_hash_strength', 'tank_auth'),
-					$this->ci->config->item('phpass_hash_portable', 'tank_auth'));
-			if ($hasher->CheckPassword($password, $user->password)) {			// success
-
-				$this->ci->users->delete_user($user_id);
-				$this->logout();
-				return TRUE;
-
-			} else {															// fail
-				$this->error = array('password' => 'auth_incorrect_password');
-			}
-		}
-		return FALSE;
-	}
+	
 
 	/**
 	 * Get error message.

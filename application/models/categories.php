@@ -10,9 +10,10 @@
  * @package	Tank_auth
  * @author	Ilya Konyukhov (http://konyukhov.com/soft/)
  */
-class Cars extends CI_Model
+class Categories extends CI_Model
 {
-	private $table_name			= 'cars';			// cars
+	private $table_name			= 'categories';			// cars
+        private $tbl_name='categories';
 	private $car_img_table_name	= 'car_imgs';	// car images
         private $watch_car_table_name = 'watch_cars';
         private $comment_car_table_name = "comment_cars";
@@ -37,37 +38,7 @@ class Cars extends CI_Model
             
 	}
 
-	/**
-	 * Get car record by Id
-	 *
-	 * @param	int
-	 * @return	object
-	 */
-	function get_car_by_id($car_id)
-	{
-		$this->db->where('id', $car_id);
-		$query = $this->db->get($this->table_name);
-
-                if ($query->num_rows() == 1) return $query->row();
-		return NULL;
-	}
-        
-        /**
-	 * Get car record by Id
-	 *
-	 * @param	int
-	 * @return	object
-	 */
-	function get_post_code_obj($p_code)
-	{
-            $this->db->like('Pcode', $p_code);
-            //$this->db->like('make', $make); 
-            
-            $query = $this->db->get($this->post_codes_table_name);
-            
-            if ($query->num_rows() >= 1) return $query->row();
-            return NULL;
-	}
+       
         
         /**
 	 * Get comment record by Id
@@ -493,6 +464,31 @@ class Cars extends CI_Model
             
             return $list;           
 	}
+       
+        /**
+	 * Create new item into comment_car table
+	 *
+	 * @cid :car id
+         * @uid : user_id
+         * @comment : comment text
+	 * @return	array
+	 */
+	 function insert($qry)
+	{
+             
+            $this->db->set('cid', $cid);
+            $this->db->set('uid', $uid);
+            $this->db->set('comment', $comment);
+            
+            
+             if ($this->db->insert($this->comment_car_table_name)) {
+                   $comm_id = $this->db->insert_id();                          
+                   return $comm_id;
+            }
+            
+            return "-1"; //false
+            
+	}
         
         /**
 	 * Create new item into comment_car table
@@ -513,6 +509,29 @@ class Cars extends CI_Model
              if ($this->db->insert($this->comment_car_table_name)) {
                    $comm_id = $this->db->insert_id();                          
                    return $comm_id;
+            }
+            
+            return "-1"; //false
+            
+	}
+        
+         /**
+	 * Create new clip
+	 *
+	 * @cid :category id
+         * @uid : user_id
+         * @comment : comment text
+	 * @return	array
+	 */
+	 function add_clip($category_id,$video_url)
+	{
+             
+            $this->db->set('category_id', $category_id);
+            $this->db->set('video_url', $video_url);
+            
+             if ($this->db->insert("clips")) {
+                   $clip_id = $this->db->insert_id();                          
+                   return $clip_id;
             }
             
             return "-1"; //false
@@ -627,63 +646,7 @@ class Cars extends CI_Model
             $this->db->delete($this->message_car_table_name);
 	}
         
-         /**
-	 * Create new item into offer_cars table
-	 *
-	 * @s_id :sender id
-         * @r_id : receiver_id
-         * @price : price
-         * @message : message text
-	 * @return	array
-	 */
-	 function add_offer_car($uid,$cid,$price,$message)
-	{
-             
-            $this->db->set('uid', $uid);
-            $this->db->set('cid', $cid);
-            $this->db->set('price', $price);
-            $this->db->set('message', $message);
-            $this->db->set('created', date('Y-m-d H:i:s'));
-            
-            
-            if ($this->db->insert($this->offer_car_table_name)) {
-                   $msg_id = $this->db->insert_id();                                      
-                   return $msg_id;
-            }
-            
-            return "-1";
-            
-	}
         
-        /**
-	 * get list of messages watched by users for a specific car
-         * @cid  : car id
-         * @number : number of messages
-         * @offset : offset of message
-	 * @return	array
-	 */
-	 function list_offer_car($cid,$number,$offset)
-	{
-            
-            $this->db->where('cid', $cid);
-                        
-            $query = $this->db->get($this->offer_car_table_name,$number,$offset);
-            
-            $list=array(); $i=0;
-            foreach ($query->result() as $row)
-            {
-                
-                $list[$i] = array( 'offer_id' => $row->id,
-                        'msg' => $row->message,
-                    'c_date' => $row->created,
-                    'price' => $row->price,
-                    's_id' => $row->uid,
-                );
-                
-                $i++;                
-            }            
-            return $list;           
-	}
         
         /**
 	 * Remove offer car record by id
@@ -698,57 +661,58 @@ class Cars extends CI_Model
             $this->db->delete($this->offer_car_table_name);
 	}
 
-        /***
-         * 
-         * Get distance between 2 postal codes
-         * 
-         */
-        function calc_postcode_distance($pcodeA,$pcodeB)
-        {
+        
+        
+         function &get_object_list( $start=0, $count=1000, $search_option='') {
 
-            // PCODE A
-            //$this->db->where('Pcode', $pcodeA);
-            $this->db->like('Pcode', $pcodeA); 
-                        
-            $query = $this->db->get($this->post_codes_table_name,1,0);
+		$strSql = "SELECT COUNT(*) AS cnt FROM $this->tbl_name";
+		$query = $this->db->query($strSql);		
+		$row = $query->row_array();
+		$return_arr['total'] = $row['cnt'];
+                $strSql = "SELECT * FROM $this->tbl_name WHERE 1=1 LIMIT $start, $count";
+                
+
+                $query = $this->db->query($strSql);
+		$return_arr['rows'] = $query->result_array();
+		
+		return $return_arr;
+	}
+	
+	function &get_specific_data($idx) {
             
-             if (sizeof ($query->result()) >0){
-                $row=$query->result();
-                $gridn[0]=$row[0]->Grid_N;//;$row[Grid_N];
-                $gride[0]=$row[0]->Grid_E;//$row[Grid_E];
-            }
-            else
-                return -1;
+            $strSql = "SELECT * FROM $this->tbl_name WHERE id='$idx'";
+            
+            $query = $this->db->query($strSql);
+            $row = $query->row_array();
+            return $row;
+	}
+	
+	function get_next_insert_idx($tbl_name) {
 
-            // PCODE B 
-            //$this->db->where('Pcode', $pcodeB);
-            $this->db->like('Pcode', $pcodeB); 
-                        
-            $query = $this->db->get($this->post_codes_table_name,1,0);
-            //$result=$query->result;            
-            if (sizeof ($query->result()) >0){
-                $row=$query->result();
-                $gridn[1]=$row[0]->Grid_N;
-                $gride[1]=$row[0]->Grid_E;
-            }
-            else{
-                return -1;
-            }
-          
-            // TAKE GRID REFS FROM EACH OTHER.
-
-            $distance_n=$gridn[0]-$gridn[1];
-            $distance_e=$gride[0]-$gride[1];
-
-            // CALCULATE THE DISTANCE BETWEEN THE TWO POINTS
-
-            $hypot=sqrt(($distance_n*$distance_n)+($distance_e*$distance_e));
-
-            $kms=round($hypot/1000,2);            
-
-            return $kms;
-
-        }
+		$next_increment = 0;
+		$strSql = "SHOW TABLE STATUS WHERE Name='$this->tbl_name'";
+		$query = $this->db->query($strSql);
+		$row = $query->row_array();
+		$next_increment = $row['Auto_increment'];
+		
+		return $next_increment;
+	}
+	
+	function &_create_pagenation($per_page,$total,$base_url) {
+    	
+                $this->load->library('pagination');
+		$config['base_url'] = $base_url;
+		$config['page_query_string'] = TRUE;
+		$config['total_rows'] = $total;
+		$config['per_page'] = $per_page;
+		$config['full_tag_open'] = "<div style='padding:8px;'>";
+		$config['full_tag_close'] = "</div>";
+		
+		$this->pagination->initialize($config); 
+		$pagenation = $this->pagination->create_links();
+			
+		return $pagenation;
+    }
         
 }
 

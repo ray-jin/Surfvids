@@ -2,10 +2,7 @@
 
 	
 	$config['main_category'] = array(
-		'user'	=>	'Users',	
-                'backend\bcar'	=>	'Cars',
-                'backend\bmessage'	=>	'Messages',
-                'backend\boffer'	=>	'Offers',
+                'category'	=>	'Categories',
                 'backend\bcomment'	=>	'Comments',
 	);
         $config['max_count_per_page'] = 10;	
@@ -22,9 +19,13 @@
         $config['success']="0";
         $config['login_incorrect_fname_umail']="3";
         $config['max_img_size']=2048; //2MB;
+        $config['max_video_size']=2048*1024; //2MB;
         $config['invalid_session']="Invalid session"; 
         $config['upload_path']="uploads";
         $config['failed']="Failed";
         $config['unknown_error']="unknow error";
         $config['not_exist']="does not exist";
+        define ('UPLOAD_PATH',"http://localhost/Surfvids/uploads/");
+        define ('RESOURCE_PATH',"http://localhost/Surfvids/resource/");
+        define ('HOST',"http://localhost/Surfvids/");
         

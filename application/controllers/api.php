@@ -9,8 +9,8 @@ class Api extends CI_Controller
 
 		$this->load->library('security');
 		$this->load->library('tank_auth');
-		$this->load->model('manage_m');
-                $this->load->model('manage_m/users');
+		//$this->load->model('manage_m');
+               // $this->load->model('manage_m/users');
                 $this->load->helper('url');
 	}
 	
