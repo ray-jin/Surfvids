@@ -10,7 +10,7 @@ class Api extends CI_Controller
 		$this->load->library('security');
 		$this->load->library('tank_auth');
 		//$this->load->model('manage_m');
-               // $this->load->model('manage_m/users');
+                $this->load->model('categories'); // a little different
                 $this->load->helper('url');
 	}
 	
@@ -341,41 +341,63 @@ class Api extends CI_Controller
 		echo json_encode($result);
 	}
         
-	 /*
-         * @uid : Test
-         * @sid : session id
-          * Mailgun Test
-         * @return ufuname, current car, about me, location (postal code), image url
+	 
+        
+         /*
+         * list products_attributes
+         * @param	int
+	 * @return	array of array
          */
-        function mailgun_test(){
-             $ch = curl_init();
-               
-            curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-            curl_setopt($ch, CURLOPT_USERPWD, 'api:key-0iizmqtrsytx5o59xvq9pksy5jvdvey7');
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-
-            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
-            curl_setopt ($ch, CURLOPT_SSL_VERIFYHOST, 0);
-            curl_setopt ($ch, CURLOPT_SSL_VERIFYPEER, 0);
-            curl_setopt($ch, CURLOPT_URL, 'https://api.mailgun.net/v2/rayjin.mailgun.org/messages');
-            curl_setopt($ch, CURLOPT_POSTFIELDS, array('from' => 'nice.ray.jin@gmail.com',
-                                                        'to' => 'gold.brain.pitt@gmail.com',
-                                                        'Reply-To' => 'iwantacar@rayjin.mailgun.org',
-                                                        'sender' => 'gold.brain.pitt@gmail.com',
-                                                        'subject' => 'Hello',
-                                                        'text' => 'Testing some Mailgun !'));
-
-            $result = curl_exec($ch);
-            if( ! $result ) 
-                { 
-                    trigger_error(curl_error($ch)); 
-                } 
-            curl_close($ch);
-            echo $result;
-            
-           // return $result;
-        }
+	function list_categories() {                        
+                
+           $categories_list=$this->categories->list_categories();
+           $i=0; $list=array();           
+           foreach ($categories_list as $row)
+           {                
+              $clip_list=$this->categories->list_clips($row['id']);
+              if (sizeof($clip_list)>0){                  
+                  $list[$i]['id']=$row['id'];
+                  $list[$i]['image_url']=$row['image_url'];        
+                  $list[$i]['price']=$row['price'];
+                  $list[$i]['video_info']=$row['video_info'];
+                  $list[$i]['clips_list']=$clip_list;
+                  $i++;
+              }
+              
+           }
+           //print_r($list);
+           $result['categories']=$list;
+           $result['status'] = $this->config->item('success');
+                                              
+            echo json_encode($result);  
+	}
 	
+        
+        
+         /*
+         * list products_attributes
+         * @param	int
+	 * @return	array of array
+         */
+	function list_comments() {
+                
+            if (!isset($_REQUEST['category_id']))
+            {
+                $result['status'] = $this->config->item('fail');
+                $result['error'] = $this->config->item('invalid_params');
+                echo json_encode($result);
+                return;
+            } 
+           
+           $comments_list=$this->categories->list_comments($_REQUEST['category_id']);
+           $i=0; $list=array();           
+           
+           //print_r($list);
+           $result['comments']=$comments_list;
+           $result['status'] = $this->config->item('success');
+                                              
+            echo json_encode($result);  
+	}
 }
 
 /* End of file welcome.php */

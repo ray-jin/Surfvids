@@ -75,7 +75,7 @@
             <label >Price</label> $<?php echo $post['price']; ?>            
     </fieldset>
     <fieldset >
-            <label>Video Info</label>
+            <label>Category Info</label>
             <textarea name="<?php echo $video_info['name']; ?>" rows="10" readonly><?php echo $post['video_info']?></textarea>
     </fieldset>
   </div>

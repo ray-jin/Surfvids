@@ -14,8 +14,8 @@
         $config['invalid_params']="Invalid parameters";
         $config['incorrect_fbname_umail']="Incorrect facebook id or mail id";
         $config['register_duplicate_umail']="Duplicate items";
-        $config['fail']="-1";
-        $config['success']="0";
+        $config['fail']="0";
+        $config['success']="1";
         $config['login_incorrect_fname_umail']="3";
         $config['max_img_size']=2048; //2MB;
         $config['max_video_size']=2048*1024; //2MB;

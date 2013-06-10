@@ -340,6 +340,53 @@ class Categories extends CI_Model
 			
 		return $pagenation;
     }
+    
+     /*
+         * list products_attributes
+         * @param	int
+	 * @return	array of array
+         */
+	function list_categories() {                        
+
+            $query = $this->db->get("categories");
+            
+            $list=array(); $i=0;
+            foreach ($query->result() as $row)
+            {
+                
+                if ($row->image_url!=""){
+                    $list[$i] = array( 'id' => $row->id, 
+                            'image_url' => UPLOAD_PATH.$row->id."/image/".$row->image_url,
+                            'price' => $row->price ,
+                            'video_info' => $row->video_info ,
+                    );
+                    $i++;
+                }
+            }
+            return $list;  
+	}
+        
+        /*
+         * list products_attributes
+         * @param	int
+	 * @return	array of array
+         */
+	function list_clips($category_id) {                        
+            $this->db->where('category_id', $category_id);
+            
+            $query = $this->db->get("clips");
+            
+            $list=array(); $i=0;
+            foreach ($query->result() as $row)
+            {
+                $list[$i] = array( 'id' => $row->id,
+                        'video_url' => UPLOAD_PATH.$category_id."/video/".$row->video_url,              
+                );
+                $i++;                
+            }            
+            return $list;     
+            
+	}
         
 }
 
