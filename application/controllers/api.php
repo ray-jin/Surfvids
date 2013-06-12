@@ -357,10 +357,13 @@ class Api extends CI_Controller
               $clip_list=$this->categories->list_clips($row['id']);
               if (sizeof($clip_list)>0){                  
                   $list[$i]['id']=$row['id'];
-                  $list[$i]['image_url']=$row['image_url'];        
+                  $list[$i]['purchase_id']=$row['purchase_id'];
+                  $list[$i]['image_url']=$row['image_url'];
+                  $list[$i]['name']=$row['name'];
                   $list[$i]['price']=$row['price'];
                   $list[$i]['video_info']=$row['video_info'];
                   $list[$i]['clips_list']=$clip_list;
+                  
                   $i++;
               }
               
@@ -397,6 +400,29 @@ class Api extends CI_Controller
            $result['status'] = $this->config->item('success');
                                               
             echo json_encode($result);  
+	}
+        
+         /*   
+	 * accept comment from mobile app and insert it on the db
+	 */
+	function add_comment() {
+            
+            if (!isset($_REQUEST['category_id']) || !isset($_REQUEST['comment']) )
+            {
+                $result['error'] = $this->config->item('invalid_params');
+                $result['status']=$this->config->item('fail');
+                echo json_encode($result);
+                return;
+            } 
+            $category_id=$_REQUEST['category_id'];
+            $comment=$_REQUEST['comment'];
+            
+            $comm_id=$this->categories->add_comment($category_id,$comment);
+            
+            $result['status'] = $this->config->item('success');
+            $result['comm_id'] = $comm_id;
+            
+            echo json_encode($result);
 	}
 }
 

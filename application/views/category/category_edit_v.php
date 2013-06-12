@@ -70,8 +70,7 @@
         
         $video_url="";
         if ($clip!=null){
-            
-            $video_url=HOST.$this->config->item('upload_path')."/".$post['id']."/video/".$clip->video_url;
+            $video_url=VIDEO_PATH."/".$post['name']."/".$clip->video_url;            
         }
         
 ?>
@@ -124,7 +123,7 @@
                 
                 <br/>
                 <div style="position: relative; float: left; padding-left: 50px;">
-                    <img id="pic" src="<?php echo UPLOAD_PATH.$post['id']."/image/".$post['image_url'];?>" height="80px" width="80px"> </img>
+                    <img id="pic" src="<?php echo IMAGE_PATH."/".$post['image_url'];?>" height="80px" width="80px"> </img>
                 </div>
                 <div id="f1_upload_form" style="position: relative; float: left;  padding-left: 40px;"></div> <br/>
                 
@@ -144,7 +143,18 @@
                 <?php if ($video_url!="") {?>
                     <embed  src="<?php echo $video_url;?>" width="300" height="200" autoplay="true" 
                     controller="true" loop="false" pluginspage='http://www.apple.com/quicktime/download/' style="padding-left: 50px;">
-                    </embed>
+                    </embed> 
+                    
+                   <!-- <script>
+                                        QT_WriteOBJECT(
+                            "http://surfvidz.com/Main Movie Folder/Around The World In 80 Waves/Around The World In 80 Waves_part1.mov", "640", "376", "",
+                            "controller","true",
+                            "name","movie1",
+                            "autoplay","true",
+                            "scale","TOFIT",
+                            "pluginspage","http://www.apple.com/quicktime/download/"
+                    );
+                    </script>-->
                 <?php }?>
                 <div id="f2_upload_form" style="position: relative; padding-left: 40px;"></div> <br/>
             </form>
@@ -188,6 +198,8 @@
     }
     
     function showClipList(data){       
+        
+        
         var result=eval("("+data+")");
         if (result.status==0){
             alert(result.error);
@@ -348,4 +360,74 @@
     ListClips_Request();
     
     
-</script> 
+</script>
+<script>
+<!--
+var count=11;
+var timecodedivlayer;
+function countdown(){
+ //count--; 
+changelayer_content(count);
+if (count>0){
+ Id = window.setTimeout("countdown()",1000); 
+} 
+else{
+window.close();
+}
+}	
+
+function hhmmss (timeinseconds) {
+
+hh = Math.floor(timeinseconds/(60*60));
+mm = Math.floor( (timeinseconds - (hh*(60*60)))/60)
+if (mm < 10) {mm = "0" + mm;}
+
+ss = timeinseconds - (hh*(60*60) + mm*60);
+if (ss < 10) {ss = "0" + ss;}
+
+return hh + ":" + mm + ":" + ss;
+
+
+}
+
+function changelayer_content(counter){
+
+doit="no";
+if (document.movie1.GetPluginStatus() == "Complete") {doit="yes";}
+if (document.movie1.GetPluginStatus() == "Playable") {doit="yes";}
+
+
+if (doit == "yes")
+	{
+	curtime = hhmmss(Math.round(document.movie1.GetTime() / document.movie1.GetTimeScale()));
+	tottime = hhmmss(Math.round(document.movie1.GetDuration() / document.movie1.GetTimeScale()));
+
+	msgstring = curtime + " of " + tottime;
+	
+	}
+	else
+	{
+	msgstring = "Loading...";
+	}
+
+
+if(document.layers){
+//thisbrowser="NN4";
+timecodedivlayer = document.layers[0];
+timecodedivlayer.document.open();
+timecodedivlayer.document.write(msgstring);
+timecodedivlayer.document.close();
+                     }
+ if(document.all){
+//thisbrowser="ie"
+timecodedivlayer = document.all["timecodediv"];
+timecodedivlayer.innerHTML=msgstring;
+                      }
+if(!document.all && document.getElementById){
+//thisbrowser="NN6";
+timecodedivlayer = document.getElementById("timecodediv");
+timecodedivlayer.innerHTML =msgstring;
+ }
+}
+// -->
+</script>

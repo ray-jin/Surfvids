@@ -13,6 +13,7 @@ class Auth extends CI_Controller
 		$this->load->library('security');
 		$this->load->library('tank_auth');
 		$this->lang->load('tank_auth');
+                $this->load->model('categories'); // a little different
 	}
 
         function _remap($method){
@@ -31,6 +32,36 @@ class Auth extends CI_Controller
 		}
 	}
 
+        function contact()
+	{
+          
+		if ($this->tank_auth->is_logged_in() && $this->tank_auth->is_admin_level() ) { // logged in as admin
+
+		} 
+                else {
+                        $this->form_validation->set_rules('name', 'name', 'trim|required|xss_clean');
+			$this->form_validation->set_rules('email', 'email', 'trim|required|xss_clean|valid_email');
+			$this->form_validation->set_rules('subject', 'subject', 'trim|required|xss_clean');
+                        $this->form_validation->set_rules('message', 'message', 'trim|required|xss_clean');
+                        $data['errors'] = array();
+                        if ($this->form_validation->run()==false) {								// validation ok                             
+                             $data['errors']['contains_error']="1";
+			}
+                        else {
+                            
+                            $id=$this->categories->add_contact($_REQUEST['name'],$_REQUEST['email'],$_REQUEST['subject'],$_REQUEST['message']);
+                            if ($id==0){
+                                $data['errors']['contact_error']="Sorry,error occured";
+                            }
+                            else{
+                                redirect('/auth/login/');
+                            }
+                            
+                        }
+                        
+			$this->load->view('auth/contact_form',$data);
+		}
+	}
 	/**
 	 * Login user on the site
 	 *

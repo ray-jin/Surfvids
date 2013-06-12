@@ -24,7 +24,10 @@
         $config['failed']="Failed";
         $config['unknown_error']="unknow error";
         $config['not_exist']="does not exist";
-        define ('UPLOAD_PATH',"http://localhost/Surfvids/uploads/");
-        define ('RESOURCE_PATH',"http://localhost/Surfvids/resource/");
-        define ('HOST',"http://localhost/Surfvids/");
+        define ('HOST',"http://192.168.180.90/Surfvids");
+        //define ('UPLOAD_PATH',HOST."/uploads/");
+        define('VIDEO_PATH',"http://surfvidz.com/Main Movie Folder");
+        define('IMAGE_PATH',"http://surfvidz.com/Main Image Folder");
+        define ('RESOURCE_PATH',HOST."/resource/");
+        
         

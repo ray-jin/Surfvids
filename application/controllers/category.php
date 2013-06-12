@@ -137,6 +137,7 @@ class Category extends CI_Controller
                                                 'price'		=> $this->input->post('price'),
                                                 'video_info'	=> $this->input->post('video_info'),
                                                 'image_url'     => "",
+                                                'purchase_id'  => $new_idx,
                                         )
                                 );
                                 $data['show_message'] = "Successfully added!";

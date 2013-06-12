@@ -11,6 +11,7 @@
 	<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
 	<![endif]-->
 	<script src="<?php echo JS_DIR; ?>/jquery-1.7.1.min.js" type="text/javascript"></script>
+        <script src="<?php echo JS_DIR; ?>/AC_QuickTime.js" language="JavaScript" type="text/javascript"></script>
 	<script src="<?php echo JS_DIR; ?>/hideshow.js" type="text/javascript"></script>
 	<script src="<?php echo JS_DIR; ?>/jquery.tablesorter.min.js" type="text/javascript"></script>
 	<script type="text/javascript" src="<?php echo JS_DIR; ?>/jquery.equalHeight.js"></script>
@@ -57,21 +58,31 @@
 	</header> <!-- end of header bar -->
 	
 	<section id="secondary_bar">
-		<div class="user">
+		
 <?php
 	if($this->tank_auth->is_logged_in())  {
-		echo "<p>".$this->tank_auth->get_username()."</p>";
+            
+            echo "<div class='user'>";
+            echo "<p>".$this->tank_auth->get_username()."</p>";
+            echo "</div>";    
 	}
 ?>
-		</div>
-		<div class="breadcrumbs_container">
-		</div>
+		
+            <div class="breadcrumbs_container" >
+            </div>
 	</section><!-- end of secondary bar -->
 
 <?php
+        $str ="";
+       if($this->tank_auth->is_logged_in())  {
+		require ("sidebar_v.php");
+	}
+        else{
+            $str=" style='width:100%;' ";
+        }
         
-            require ("sidebar_v.php");
+       
 ?>
 
-	<section id="main" class="column">
+	<section id="main" class="column" <?php echo $str; ?>>
 		

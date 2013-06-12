@@ -17,12 +17,12 @@ $f_search = array(	//text field
             <thead>
                 <tr align="center">
                     <th width="30">No.</th>
-                    <th width="100">Name</th>
-                    <th width="100">Image</th>                    
-                    <th width="100">Price</th>
-                    <th width="100">Video URL</th>
-                    <th width="100">Video Info</th>
-                    <th width="100">Actions</th>
+                    <th >Name</th>
+                    <th >Image</th>                    
+                    <th >Price</th>
+                    <th style="width : 100px; ">Number of Part</th>
+                    <th >Video Info</th>
+                    <th style="width : 120px; ">Actions</th>
                 </tr>
             </thead> 
             <tbody> 
@@ -30,10 +30,11 @@ $f_search = array(	//text field
             $i = 1;
             foreach($category_list as $row) {
                 $video_info=$row['video_info'];
-                if (strlen($row['video_info'])>30){
-                    $video_info=substr($row['video_info'],0,30)."...";
+                if (strlen($row['video_info'])>230){
+                    $video_info=substr($row['video_info'],0,230)."...";
+                  //  $video_info=$row['video_info'];
                 }
-                $video_url=$this->categories->get_clip_urls($row['id']);
+                
             ?>
                 <tr >		
                     <td><?php echo $i; ?></td>
@@ -42,7 +43,7 @@ $f_search = array(	//text field
                         <?php
                             if ($row['image_url']!=""){
                         ?>
-                            <img src="<?php echo UPLOAD_PATH.$row['id']."/image/".$row['image_url'];?>" alt="<?php echo $row['name'];?>" height="80" width="80">
+                            <img src="<?php echo IMAGE_PATH."/".$row['image_url'];?>" alt="<?php echo $row['name'];?>" height="80" width="80">
                         <?php
                             }
                             else{
@@ -54,8 +55,11 @@ $f_search = array(	//text field
                     <td>$<?php echo $row['price'];?></td>
                     <td>
                         <?php
-                            if ($video_url!=""){
-                                echo $video_url;
+                            
+                            $clip_count=$this->categories->get_clip_number_of_part($row['id']);
+                           
+                            if ($clip_count!=0){
+                                echo $clip_count;
                         ?>
 
                         <?php
@@ -66,7 +70,8 @@ $f_search = array(	//text field
                         ?>
                     </td>
                     <td><?php echo $video_info?></td>
-                    <td>
+                    
+                    <td style="width : 120px; ">
                         <input type="image" title="Edit" style="vertical-align: middle;" src="<?php echo IMG_DIR; ?>/icn_edit.png" onclick="goedit(<?php echo $row['id'];?>)">
                         <input type="image" title="Trash" style="vertical-align: middle;" src="<?php echo IMG_DIR; ?>/icn_trash.png" onclick="confirm_del(<?php echo $row['id'];?>)">
                         <input type="image" title="Comment" style="vertical-align: middle;" weight="16px;" height="16px;" src="<?php echo IMG_DIR; ?>/icn_comment.png" onclick="gocomment(<?php echo $row['id'];?>)">

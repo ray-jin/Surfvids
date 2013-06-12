@@ -8,7 +8,7 @@
 //-->
 </script>
 
-	<aside id="sidebar" class="column">
+	<aside id="sidebar" class="column" >
 <?php
 	if($this->tank_auth->is_logged_in()) : 
 ?>
@@ -30,6 +30,7 @@
 <?php
 	$main_arr = $this->config->item("main_category");
 	foreach($main_arr as $key => $val) {
+                
 		$link = site_url($key);
 		$class = "class='icn_folder'";
 		echo "<li $class ><a href='$link'>$val</a></li>";
@@ -38,7 +39,7 @@
 		</ul>
 		<h3>Admin</h3>
 		<ul class="toggle">
-			<li class="icn_settings"><a href="http://localhost/Surfvids/index.php/user/user_edit/1">Admin</a></li>
+                    <li class="icn_settings"><a href="<?php echo site_url('user');?>/user_edit/1">Admin</a></li>
 			<li class="icn_jump_back"><a href="javascript:confirm_logout()">Logout</a></li>
 		</ul>
 <?php   

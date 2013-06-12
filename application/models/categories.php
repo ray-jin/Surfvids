@@ -15,7 +15,7 @@ class Categories extends CI_Model
 	private $table_name			= 'categories';			// cars
         private $tbl_name='categories';	
         
-        private $comment_car_table_name = "comment_cars";
+        private $comment_table_name = "comments";
         
 
 	function __construct()
@@ -24,13 +24,11 @@ class Categories extends CI_Model
 
             $ci =& get_instance();
             $this->table_name			= $ci->config->item('db_table_prefix', 'tank_auth').$this->table_name;
-            $this->comment_car_table_name   = $ci->config->item('db_table_prefix', 'tank_auth').$this->comment_car_table_name;            
+            $this->comment_table_name   = $ci->config->item('db_table_prefix', 'tank_auth').$this->comment_table_name;            
             $this->load->helper('url');
             
 	}
 
-       
-        
         /**
 	 * Get comment record by Id
 	 *
@@ -75,25 +73,20 @@ class Categories extends CI_Model
 	}
         
         /**
-	 * get first car img url file
+	 * Return number of part of clips
 	 *
 	 * @param	array
 	 * @return	array
 	 */
-	 public function get_first_car_img_loc($car_id)
+        public function get_clip_number_of_part($category_id)
 	{
-            $this->db->where('car_id', $car_id);
+            $this->db->where('category_id', $category_id);            
+            $query = $this->db->get("clips");            
             
-            $query = $this->db->get($this->car_img_table_name);
-            
-            if (sizeof ($query->result()) >0){
-                $row=$query->result();
-                return $row[0]->img_loc;
-            }
-            else
-                return null;
+            return $query->num_rows();
                          
 	}
+        
         
     
         
@@ -194,21 +187,20 @@ class Categories extends CI_Model
          * @comment : comment text
 	 * @return	array
 	 */
-	 function add_comment_car($cid,$uid,$comment)
-	{
+	 function add_comment($category_id,$comment)
+	 {
              
-            $this->db->set('cid', $cid);
-            $this->db->set('uid', $uid);
+            $this->db->set('category_id', $category_id);
             $this->db->set('comment', $comment);
+            $date = new DateTime();
+            $datetime = $date->format('Y-m-d H:i:s');
+            $this->db->set('created', $datetime );
             
-            
-             if ($this->db->insert($this->comment_car_table_name)) {
-                   $comm_id = $this->db->insert_id();                          
+             if ($this->db->insert($this->comment_table_name)) {
+                   $comm_id = $this->db->insert_id();                   
                    return $comm_id;
-            }
-            
+            }            
             return "-1"; //false
-            
 	}
         
          /**
@@ -266,7 +258,8 @@ class Categories extends CI_Model
             foreach ($query->result() as $row)
             {
                 $list[$i] = array( 'id' => $row->id,
-                        'comment' => $row->comment,                
+                        'comment' => $row->comment,  
+                        'created' => $row->created,
                 );
                 $i++;                
             }            
@@ -347,7 +340,8 @@ class Categories extends CI_Model
 	 * @return	array of array
          */
 	function list_categories() {                        
-
+            
+            $this->db->order_by('name');
             $query = $this->db->get("categories");
             
             $list=array(); $i=0;
@@ -356,9 +350,11 @@ class Categories extends CI_Model
                 
                 if ($row->image_url!=""){
                     $list[$i] = array( 'id' => $row->id, 
-                            'image_url' => UPLOAD_PATH.$row->id."/image/".$row->image_url,
+                            'image_url' => IMAGE_PATH."/".$row->image_url,
                             'price' => $row->price ,
                             'video_info' => $row->video_info ,
+                            'name' => $row->name ,
+                            'purchase_id' => $row->purchase_id ,
                     );
                     $i++;
                 }
@@ -377,15 +373,45 @@ class Categories extends CI_Model
             $query = $this->db->get("clips");
             
             $list=array(); $i=0;
+            
+            $category=$this->get_specific_data($category_id);
+            
             foreach ($query->result() as $row)
             {
+                
                 $list[$i] = array( 'id' => $row->id,
-                        'video_url' => UPLOAD_PATH.$category_id."/video/".$row->video_url,              
+                        'video_url' => VIDEO_PATH."/".$category['name']."/".$row->video_url,
                 );
                 $i++;                
             }            
             return $list;     
             
+	}
+        
+        /**
+	 * Create new item into comment_car table
+	 *
+	 * @cid :car id
+         * @uid : user_id
+         * @comment : comment text
+	 * @return	array
+	 */
+	 function add_contact($name,$email,$subject,$message)
+	 {
+             
+            $this->db->set('name', $name);
+            $this->db->set('email', $email);
+            $this->db->set('subject', $subject);
+            $this->db->set('message', $message);
+            $date = new DateTime();
+            $datetime = $date->format('Y-m-d H:i:s');
+            $this->db->set('created', $datetime );
+            
+             if ($this->db->insert("contacts")) {
+                   $id = $this->db->insert_id();                   
+                   return $id;
+            }            
+            return 0; //false
 	}
         
 }
