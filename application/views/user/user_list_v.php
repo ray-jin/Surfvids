@@ -18,7 +18,7 @@
             $i = 0;
             foreach($user_list as $row) {
             ?>
-                <tr>				                    
+                <tr >				                    
                     <td><?php echo $row['username'];?></td>
                     <td><?php echo $row['email'];?></td>
                     <td>

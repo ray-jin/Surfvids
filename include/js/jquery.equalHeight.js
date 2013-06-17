@@ -8,12 +8,9 @@
            
             tallest = 0;
             this.each(function(){
-                thisHeight = $(this).height();
-                
+                thisHeight = $(this).height();                
                 if( thisHeight > tallest)
-                    tallest = thisHeight;
-                
-                
+                    tallest = thisHeight;                
             });
 
             // set each items height to use the tallest value found

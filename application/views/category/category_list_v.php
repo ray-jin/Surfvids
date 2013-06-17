@@ -17,10 +17,10 @@ $f_search = array(	//text field
             <thead>
                 <tr align="center">
                     <th width="30">No.</th>
-                    <th >Name</th>
+                    <th style="width : 130px;">Name</th>
                     <th >Image</th>                    
                     <th >Price</th>
-                    <th style="width : 100px; ">Number of Part</th>
+                    <th style="width : 100px; align : center; ">Number of Part</th>
                     <th >Video Info</th>
                     <th style="width : 120px; ">Actions</th>
                 </tr>
@@ -28,6 +28,8 @@ $f_search = array(	//text field
             <tbody> 
             <?php
             $i = 1;
+            
+            
             foreach($category_list as $row) {
                 $video_info=$row['video_info'];
                 if (strlen($row['video_info'])>230){
@@ -37,7 +39,7 @@ $f_search = array(	//text field
                 
             ?>
                 <tr >		
-                    <td><?php echo $i; ?></td>
+                    <td><?php echo $i+$start_no ; ?></td>
                     <td><?php echo $row['name'];?></td>
                     <td>
                         <?php
@@ -53,7 +55,7 @@ $f_search = array(	//text field
                              
                     </td>
                     <td>$<?php echo $row['price'];?></td>
-                    <td>
+                    <td style="text-align : center;">
                         <?php
                             
                             $clip_count=$this->categories->get_clip_number_of_part($row['id']);
@@ -95,7 +97,7 @@ $f_search = array(	//text field
                     return false;
             }
             function confirm_del(pid) {
-                    if(!confirm('Are you sure to delete?')) {
+                    if(!confirm('Are you sure to delete?', "Modified title")) {
                             return;
                     }
                     window.location.href = "<?php echo site_url("$post_key"."/".$post_key."_del"); ?>/" + pid;

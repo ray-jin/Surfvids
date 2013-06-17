@@ -28,6 +28,8 @@
         //define ('UPLOAD_PATH',HOST."/uploads/");
         define('VIDEO_PATH',"http://surfvidz.com/Main Movie Folder");
         define('IMAGE_PATH',"http://surfvidz.com/Main Image Folder");
+        define('IMAGE_UPLOAD_PATH',"/Main Image Folder");
+        define('VIDEO_UPLOAD_PATH',"/Main Movie Folder");
         define ('RESOURCE_PATH',HOST."/resource/");
         
         

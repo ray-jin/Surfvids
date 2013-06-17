@@ -37,6 +37,8 @@ class Category extends CI_Controller
             $base_url = site_url("category?a=1");
             $data['pagenation'] = $this->categories->_create_pagenation($per_page, $total_page, $base_url);
             $data['post_key'] = "category";
+            $data['start_no'] =$start_no;
+            
             $this->load->view('category/category_list_v',$data);	
 	}
         
@@ -64,7 +66,8 @@ class Category extends CI_Controller
 		}
                 $prev=$this->categories->getClipById($clip_id);
                 $category_id = $prev->category_id;
-                unlink($this->config->item('upload_path')."/".$category_id."/video/".$prev->video_url); //delete physical image file
+                $category=$this->categories->get_specific_data($category_id);
+                unlink(VIDEO_UPLOAD_PATH."/".$category['name']."/".$prev->video_url); //delete physical image file
                 $strSql = "DELETE FROM clips WHERE id='$clip_id' ";
                 $this->db->query($strSql);
                 redirect("category/category_edit/".$category_id);
